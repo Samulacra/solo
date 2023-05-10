@@ -1,11 +1,7 @@
 import random
 from collections import UserList
 from enum import Enum
-from typing import Generic, TypeVar, Self, Union
-
-class Target(Enum):
-    TOP = 1
-    BOTTOM = 2
+from typing import TypeVar
 
 TCard = TypeVar('TCard')
 
@@ -15,10 +11,10 @@ class Deck(UserList[TCard]):
         (rng or random).shuffle(self)
 
 class Suit(Enum):
-    CLUBS = "C"
-    DIAMONDS = "D"
-    HEARTS = "H"
-    SPADES = "S"
+    CLUBS = '♣'
+    DIAMONDS = '♦'
+    HEARTS = '♥'
+    SPADES = '♠'
 
 class Rank(Enum):
     TWO = "2"
