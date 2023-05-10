@@ -2,7 +2,7 @@ import unittest
 from itertools import groupby
 import random
 
-from utils.deck import playing_cards, Deck, Rank, Suit
+from utils.deck import playing_cards, Deck, PlayingCard, Rank, Suit
 
 class TestDeck(unittest.TestCase):
 
@@ -13,16 +13,16 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(len(deck), 52)
 
         # Has 13 each of Clubs, Diamonds, Hearts, Spades
-        ranks = [rank for rank in Rank]
-        clubs = list(filter((lambda card: card.suit == Suit.CLUBS), deck))
-        diamonds = list(filter((lambda card: card.suit == Suit.DIAMONDS), deck))
-        hearts = list(filter((lambda card: card.suit == Suit.HEARTS), deck))
-        spades = list(filter((lambda card: card.suit == Suit.SPADES), deck))
+        self._validate_suit(deck, Suit.CLUBS)
+        self._validate_suit(deck, Suit.DIAMONDS)
+        self._validate_suit(deck, Suit.HEARTS)
+        self._validate_suit(deck, Suit.SPADES)
+
+    def _validate_suit(self, deck: Deck[PlayingCard], suit: Suit):
+        _ranks = [rank for rank in Rank]
+        _cards = list(filter(lambda card: card.suit == suit, deck))
         for idx in range(13):
-            self.assertEqual(clubs[idx].rank, ranks[idx])
-            self.assertEqual(diamonds[idx].rank, ranks[idx])
-            self.assertEqual(hearts[idx].rank, ranks[idx])
-            self.assertEqual(spades[idx].rank, ranks[idx])
+            self.assertEqual(_cards[idx].rank, _ranks[idx])
 
 class TestPlayingCards(unittest.TestCase):
 
