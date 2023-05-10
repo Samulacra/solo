@@ -1,9 +1,6 @@
 import random
 import re
 
-# from enum import Enum
-# Operation = Enum('Operation', ["ADD", "SUBTRACT"])
-
 class Die():
     def __init__(self, sides) -> None:
         self._sides = sides
@@ -29,22 +26,27 @@ d20 = Die(20)
 d100 = Die(100)
 
 class PartialResult():
-    def __init__(self, command: str, value: int) -> None:
+    def __init__(self, command: str, values: list[int], value: int) -> None:
         self._command = command
+        self._values = values
         self._value = value
     
     @property
     def command(self) -> str:
         return self._command
+    
+    @property
+    def values(self) -> list[int]:
+        return self._values
     
     @property
     def value(self) -> int:
         return self._value
 
 class Result():
-    def __init__(self, command: str, parts: list[PartialResult], value: int) -> None:
+    def __init__(self, command: str, partials: list[PartialResult], value: int) -> None:
         self._command = command
-        self._parts = parts
+        self._partials = partials
         self._value = value
 
     @property
@@ -52,8 +54,8 @@ class Result():
         return self._command
     
     @property
-    def parts(self) -> list[PartialResult]:
-        return self._parts
+    def partials(self) -> list[PartialResult]:
+        return self._partials
     
     @property
     def value(self) -> int:
@@ -62,28 +64,35 @@ class Result():
 _split_pattern = re.compile("([+-])?(\d+)?(d)?(\d+)")
 
 def _split_command(command: str):
-    out: list[tuple[str, ...]] = []
+    out: list[tuple[str, tuple[str, ...]]] = []
     idx = 0
     match = _split_pattern.search(command, idx)
     while match is not None:
         _, end = match.span()
-        out.append(match.groups())
+        out.append((match.group(), match.groups()))
         idx = end
         match = _split_pattern.search(command, idx)
     if idx != len(command):
         raise "Split failed, invalid command"
     return out
 
-def _exec_part(part: tuple[str, ...], r: random.Random) -> PartialResult:
-    op, num_times, is_die, value = part
-    op = (lambda x: x) if op is not "-" else (lambda x: -x)
+def _exec_part(part: tuple[str, tuple[str, ...]], r: random.Random) -> PartialResult:
+    (cmd, (op, num_times, is_die, value)) = part
+    op = (lambda x: x) if op != "-" else (lambda x: -x)
     value = int(float(value))
     if is_die:
         num_times = int(float(num_times or "1"))
-        value = sum([r.randint(1, value) for _ in range(num_times)])
-    return op(value)
+        values = [op(r.randint(1, value)) for _ in range(num_times)]
+        value = sum(values)
+    else:
+        value = op(value)
+        values = [value]
+    return PartialResult(cmd, values, value)
 
 def roll(command: str, r: random.Random = random) -> Result:
     parts = _split_command(command)
-    parts = [_exec_part(part, r) for part in parts]
-    pass
+    partial_results = [_exec_part(part, r) for part in parts]
+    return Result(
+        command,
+        partial_results,
+        sum([partial.value for partial in partial_results]))
