@@ -1,5 +1,4 @@
 import unittest
-from itertools import groupby
 import random
 
 from utils.deck import playing_cards, Deck, PlayingCard, Rank, Suit
