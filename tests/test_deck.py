@@ -15,6 +15,12 @@ class TestDeck(unittest.TestCase):
         bottom_card = deck.pop(0)
         self.assertEqual(bottom_card, 1)
 
+    def test_shuffle_cards(self):
+        deck = Deck([1, 2, 3, 4])
+        r = random.Random(int("deadbeef13", 16))
+        deck.shuffle(r)
+        self.assertEqual(deck, [2, 3, 1, 4])
+
 class TestPlayingCards(unittest.TestCase):
 
     def test_playing_cards(self):

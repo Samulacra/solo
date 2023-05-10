@@ -11,9 +11,8 @@ TCard = TypeVar('TCard')
 
 class Deck(UserList[TCard]):
         
-    def shuffle(self, r: random.Random = random) -> Self:
-        r.shuffle(self._cards)
-        return self
+    def shuffle(self, r: random.Random = random) -> None:
+        r.shuffle(self)
 
 class Suit(Enum):
     CLUBS = "C"
