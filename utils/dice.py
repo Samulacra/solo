@@ -12,8 +12,8 @@ class Die():
     def sides(self) -> int:
         return self._sides
 
-    def roll(self, r: random.Random = random) -> int:
-        return r.randint(1, self._sides)
+    def roll(self, rng: random.Random | None = None) -> int:
+        return (rng or random).randint(1, self._sides)
 
 d2 = Die(2)
 d3 = Die(3)
@@ -61,7 +61,7 @@ class Result():
     def value(self) -> int:
         return self._value
 
-_split_pattern = re.compile("([+-])?(\d+)?(d)?(\d+)")
+_split_pattern = re.compile(r"([+-])?(\d+)?(d)?(\d+)")
 
 def _split_command(command: str):
     out: list[tuple[str, tuple[str, ...]]] = []
@@ -73,25 +73,25 @@ def _split_command(command: str):
         idx = end
         match = _split_pattern.search(command, idx)
     if idx != len(command):
-        raise "Split failed, invalid command"
+        raise Exception("Split failed, invalid command")
     return out
 
-def _exec_part(part: tuple[str, tuple[str, ...]], r: random.Random) -> PartialResult:
+def _exec_part(part: tuple[str, tuple[str, ...]], rng: random.Random | None) -> PartialResult:
     (cmd, (op, num_times, is_die, value)) = part
     op = (lambda x: x) if op != "-" else (lambda x: -x)
     value = int(float(value))
     if is_die:
         num_times = int(float(num_times or "1"))
-        values = [op(r.randint(1, value)) for _ in range(num_times)]
+        values = [op((rng or random).randint(1, value)) for _ in range(num_times)]
         value = sum(values)
     else:
         value = op(value)
         values = [value]
     return PartialResult(cmd, values, value)
 
-def roll(command: str, r: random.Random = random) -> Result:
+def roll(command: str, rng: random.Random | None = None) -> Result:
     parts = _split_command(command)
-    partial_results = [_exec_part(part, r) for part in parts]
+    partial_results = [_exec_part(part, rng) for part in parts]
     return Result(
         command,
         partial_results,
