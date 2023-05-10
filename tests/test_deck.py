@@ -6,6 +6,17 @@ from utils.deck import playing_cards, Deck, PlayingCard, Rank, Suit
 
 class TestDeck(unittest.TestCase):
 
+    def test_draw_cards(self):
+        deck = Deck([1, 2, 3, 4])
+
+        top_card = deck.pop()
+        self.assertEqual(top_card, 4)
+
+        bottom_card = deck.pop(0)
+        self.assertEqual(bottom_card, 1)
+
+class TestPlayingCards(unittest.TestCase):
+
     def test_playing_cards(self):
         deck = playing_cards()
 
@@ -24,13 +35,3 @@ class TestDeck(unittest.TestCase):
         for idx in range(13):
             self.assertEqual(_cards[idx].rank, _ranks[idx])
 
-class TestPlayingCards(unittest.TestCase):
-
-    def test_draw_cards(self):
-        deck = Deck([1, 2, 3, 4])
-
-        top_card = deck.pop()
-        self.assertEqual(top_card, 4)
-
-        bottom_card = deck.pop(0)
-        self.assertEqual(bottom_card, 1)
